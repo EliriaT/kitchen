@@ -4,18 +4,14 @@ FROM golang:alpine as build
 # using build as current directory
 WORKDIR /build
 
-# Add the source code:
+# adding the source code to current dir:
 COPY . .
 
-## install build deps
-#RUN apk --update --no-cache add git
-#COPY go.mod go.sum ./
+# downloading dependencies and verifying
 RUN go mod download && go mod verify
 
-# downloading dependencies and
-## building server binary
-#RUN go get github.com/gorilla/mux && \
-#  go build -o server .
+
+# building the project
 RUN go build  -o kitchen .
 
 # second stage - using minimal image to run the server
@@ -25,7 +21,7 @@ FROM alpine:latest
 WORKDIR /app
 
 # copy server binary from `build` layer
-COPY --from=build /build/kitchen kitchen
+COPY --from=build /build/kitchen .
 
 # binary to run
 CMD "/app/kitchen"
