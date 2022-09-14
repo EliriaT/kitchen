@@ -75,7 +75,11 @@ func (c *cook) sendOrder(cookedOrder SentOrd) {
 		log.Printf(err.Error())
 		return
 	}
+<<<<<<< HEAD:kitchen-elem/cooks.go
 	resp, err := http.Post("http://dinning-hall:8082/distribution", "application/json", bytes.NewBuffer(reqBody))
+=======
+	resp, err := http.Post("http://dinning-hall:8080/distribution", "application/json", bytes.NewBuffer(reqBody))
+>>>>>>> 66e837f (Fix minor url problem):cooks.go
 	if err != nil {
 		log.Printf("Request Failed: %s", err.Error())
 		return
