@@ -36,6 +36,6 @@ func main() {
 	for i, _ := range cooks {
 		go cooks[i].lookUpOrders()
 	}
-	router.Run("localhost:8082")
+	router.Run(":8080")
 
 }
