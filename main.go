@@ -33,7 +33,9 @@ func main() {
 	router.GET("/cooks", getCooks)
 	router.POST("/order", receivedOrder)
 	//router.POST("/order", serveOrder)
-
-	router.Run("localhost:8082")
+	for i, _ := range cooks {
+		go cooks[i].lookUpOrders()
+	}
+	router.Run(":8080")
 
 }
