@@ -1,12 +1,15 @@
-package main
+package kitchen_elem
 
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"time"
 )
+
+const TimeUnit = 50 * time.Millisecond
 
 type cook struct {
 	Id          int    `json:"cook_id"`
@@ -16,9 +19,10 @@ type cook struct {
 	CatchPhrase string `json:"catch_phrase"`
 }
 
-func (c *cook) lookUpOrders() {
+// continously listening to OrdersChannel
+func (c *cook) LookUpOrders() {
 
-	for i := range ordersChannel {
+	for i := range OrdersChannel {
 		cookedOrder := c.cookOrder(i)
 		c.sendOrder(cookedOrder)
 
@@ -26,25 +30,25 @@ func (c *cook) lookUpOrders() {
 }
 
 // Each cook , makes an entire order. Not optimal, but for simplicity
-func (c *cook) cookOrder(orderId int) sentOrd {
+func (c *cook) cookOrder(orderId int) SentOrd {
 	cookingTime := time.Now()
-	var cookedOrder sentOrd
-	initialOrder := orderMap[orderId]
+	var cookedOrder SentOrd
+	initialOrder := OrderMap[orderId]
 
 	//Wait for the food to cook; foodID is the actual index
 	for foodID := range initialOrder.Items {
-		time.Sleep(timeUnit * time.Duration(foods[foodID].PreparationTime))
+		time.Sleep(TimeUnit * time.Duration(foods[foodID].PreparationTime))
 	}
 
-	var foodCookedInfo = make([]kitchenFoodInf, 0, len(initialOrder.Items))
+	var foodCookedInfo = make([]KitchenFoodInf, 0, len(initialOrder.Items))
 	for foodID := range initialOrder.Items {
-		foodCookedInfo = append(foodCookedInfo, kitchenFoodInf{
+		foodCookedInfo = append(foodCookedInfo, KitchenFoodInf{
 			FoodId: foodID + 1,
 			CookId: c.Id,
 		})
 	}
 	//remove the order from the list
-	delete(orderMap, orderId)
+	delete(OrderMap, orderId)
 	cookedOrder.OrderId = initialOrder.OrderId
 	cookedOrder.TableId = initialOrder.TableId
 	cookedOrder.WaiterId = initialOrder.WaiterId
@@ -58,7 +62,8 @@ func (c *cook) cookOrder(orderId int) sentOrd {
 	return cookedOrder
 }
 
-func (c *cook) sendOrder(cookedOrder sentOrd) {
+// send order back to dinning hall server
+func (c *cook) sendOrder(cookedOrder SentOrd) {
 	reqBody, err := json.Marshal(cookedOrder)
 	if err != nil {
 		log.Printf(err.Error())
@@ -69,7 +74,13 @@ func (c *cook) sendOrder(cookedOrder sentOrd) {
 		log.Printf("Request Failed: %s", err.Error())
 		return
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf(err.Error())
+			return
+		}
+	}(resp.Body)
 	//body, err := io.ReadAll(resp.Body) // Log the request body
 	//if err != nil {
 	//	log.Printf("Can't read the response body %s", err.Error())
@@ -81,7 +92,7 @@ func (c *cook) sendOrder(cookedOrder sentOrd) {
 
 }
 
-var cooks = []cook{
+var Cooks = []cook{
 	{Id: 1, Rank: 3, Proficiency: 4, Name: "Mike", CatchPhrase: "I like ice-creams!"},
 	{Id: 2, Rank: 2, Proficiency: 3, Name: "William", CatchPhrase: "So many customers these days.."},
 	{Id: 3, Rank: 2, Proficiency: 2, Name: "Elizabeth", CatchPhrase: "Oh! I gotta hurry!"},

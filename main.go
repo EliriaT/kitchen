@@ -1,40 +1,40 @@
 package main
 
 import (
+	"github.com/EliriaT/kitchen/kitchen-elem"
 	"github.com/gin-gonic/gin"
 	"log"
-	"math/rand"
 	"net/http"
 	"time"
 )
 
-const timeUnit = 50 * time.Millisecond
+const TimeUnit = 50 * time.Millisecond
 
 func getCooks(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, cooks)
+	c.IndentedJSON(http.StatusOK, kitchen_elem.Cooks)
 }
 
+// handler function for post request
 func receivedOrder(c *gin.Context) {
-	var unCookedOrder receivedOrd
+	var unCookedOrder kitchen_elem.ReceivedOrd
 	if err := c.BindJSON(&unCookedOrder); err != nil {
 		log.Printf(err.Error())
 	}
 
 	log.Printf("Order with ID %d, arrived at kitchen", unCookedOrder.OrderId)
-	ordersChannel <- unCookedOrder.OrderId
-	orderMap[unCookedOrder.OrderId] = unCookedOrder
+	kitchen_elem.OrdersChannel <- unCookedOrder.OrderId
+	kitchen_elem.OrderMap[unCookedOrder.OrderId] = unCookedOrder
 	c.IndentedJSON(http.StatusCreated, unCookedOrder)
 }
 
 func main() {
 
-	rand.Seed(time.Now().UnixNano())
 	router := gin.Default()
 	router.GET("/cooks", getCooks)
 	router.POST("/order", receivedOrder)
 	//router.POST("/order", serveOrder)
-	for i, _ := range cooks {
-		go cooks[i].lookUpOrders()
+	for i, _ := range kitchen_elem.Cooks {
+		go kitchen_elem.Cooks[i].LookUpOrders()
 	}
 	router.Run(":8080")
 

@@ -1,4 +1,4 @@
-# kitchen
+# Kitchen simulation server
 
 ## About
 This project simulates a Kitchen of a restaurant. The Kitchen has a finite order list . This order list is shared across all kitchen instances. All orders which kitchen receives have to be added to a single instance of order-list. Main work unit of the Kitchen are `cooks` . Their job is to take the order and "prepare" the menu item(s) from it, and return the orders as soon and with as little idle time as possible. Kitchen can prepare foods from different orders and it is not mandatory that one cook have to prepare entire order. Order is considered to be prepared when all foods from order list are
@@ -8,7 +8,9 @@ prepared. Each cook has the following characteristics:
 higher the rank of a cook the higher is the probability that he can work on more dishes at the same time).
 * name
 * catch phrase
+
 Example of cook object:
+
 ```golang
 {
 "rank": 3,
@@ -33,3 +35,22 @@ To run the App, run in terminal the following command:<br />
 
 
  `go run .`
+
+
+## Running in Docker container
+1. To run the app in a docker container, first build the image:<br />
+
+`docker build -t kitchen-go-server .`
+
+2. Then run the container using the created image:<br />
+
+`docker run -it --rm  -p 8080:8080 kitchen-go-server`
+
+3. To stop the running container:
+
+`docker stop {docker's id}`
+
+## Combining with dining-hall server
+
+The kitchen server listens first for Post request coming from the dining-hall. To run the system correctly, the kitchen server must run first, and after it the dinning-hall 
+server should start running. These servers use HTTP Post request for communication.
