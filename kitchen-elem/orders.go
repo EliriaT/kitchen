@@ -1,6 +1,9 @@
 package kitchen_elem
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 // the order response sent back to dinning-hall
 type SentOrd struct {
@@ -34,6 +37,10 @@ type ReceivedOrd struct {
 
 // a map of order ID with key, and the order as value
 var OrderMap = make(map[int]ReceivedOrd)
+
+// a mutex for locking reading or writing to the orderMap
+// &sync.Mutex{}
+var OrderMapMutex = &sync.Mutex{}
 
 // waiter's goroutine receive orders on channel
 var OrdersChannel = make(chan int, 10)
