@@ -44,7 +44,7 @@ To run the App, run in terminal the following command:<br />
 
 2. Then run the container using the created image:<br />
 
-docker run --name kitchen --network restaurant -it --rm  -p 8080:8080 kitchen-go-server
+`docker run --name kitchen --network restaurant -it --rm  -p 8080:8080 kitchen-go-server`
 
 For this you firstly need a created docker network. To create a docker network run:
 
