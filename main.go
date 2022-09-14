@@ -23,7 +23,10 @@ func receivedOrder(c *gin.Context) {
 
 	log.Printf("Order with ID %d, arrived at kitchen", unCookedOrder.OrderId)
 	kitchen_elem.OrdersChannel <- unCookedOrder.OrderId
+	//locking to avoid  concurrent map read and map write error
+	kitchen_elem.OrderMapMutex.Lock()
 	kitchen_elem.OrderMap[unCookedOrder.OrderId] = unCookedOrder
+	kitchen_elem.OrderMapMutex.Unlock()
 	c.IndentedJSON(http.StatusCreated, unCookedOrder)
 }
 

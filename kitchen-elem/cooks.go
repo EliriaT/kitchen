@@ -30,11 +30,13 @@ func (c *cook) LookUpOrders() {
 }
 
 // Each cook , makes an entire order. Not optimal, but for simplicity
+// maybe the RWMutex wasn't installed?
 func (c *cook) cookOrder(orderId int) SentOrd {
 	cookingTime := time.Now()
 	var cookedOrder SentOrd
+	OrderMapMutex.Lock()
 	initialOrder := OrderMap[orderId]
-
+	OrderMapMutex.Unlock()
 	//Wait for the food to cook; foodID is the actual index
 	for foodID := range initialOrder.Items {
 		time.Sleep(TimeUnit * time.Duration(foods[foodID].PreparationTime))
@@ -47,8 +49,12 @@ func (c *cook) cookOrder(orderId int) SentOrd {
 			CookId: c.Id,
 		})
 	}
-	//remove the order from the list
+
+	//remove the order from the list ; maybe i can combine with previous lock..?
+	OrderMapMutex.Lock()
 	delete(OrderMap, orderId)
+	OrderMapMutex.Unlock()
+
 	cookedOrder.OrderId = initialOrder.OrderId
 	cookedOrder.TableId = initialOrder.TableId
 	cookedOrder.WaiterId = initialOrder.WaiterId
@@ -58,7 +64,7 @@ func (c *cook) cookOrder(orderId int) SentOrd {
 	cookedOrder.PickUpTime = initialOrder.PickUpTime
 	cookedOrder.CookingTime = time.Since(cookingTime)
 	cookedOrder.CookingDetails = foodCookedInfo
-	log.Printf("cooking details: %+v", cookedOrder.CookingDetails)
+	//log.Printf("cooking details: %+v", cookedOrder.CookingDetails)
 	return cookedOrder
 }
 
@@ -69,7 +75,7 @@ func (c *cook) sendOrder(cookedOrder SentOrd) {
 		log.Printf(err.Error())
 		return
 	}
-	resp, err := http.Post("http://localhost:8080/distribution", "application/json", bytes.NewBuffer(reqBody))
+	resp, err := http.Post("http://dinning-hall:8082/distribution", "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		log.Printf("Request Failed: %s", err.Error())
 		return
