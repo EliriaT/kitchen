@@ -12,7 +12,7 @@ type SentOrd struct {
 	WaiterId       int              `json:"waiter_id"`
 	Items          []int            `json:"items"`
 	Priority       int              `json:"priority"`
-	MaxWait        int              `json:"max_wait"`
+	MaxWait        float64          `json:"max_wait"`
 	PickUpTime     time.Time        `json:"pick_up_time"`
 	CookingTime    time.Duration    `json:"cooking_time"`
 	CookingDetails []KitchenFoodInf `json:"cooking_details"`
@@ -31,7 +31,7 @@ type ReceivedOrd struct {
 	WaiterId   int       `json:"waiter_id"`
 	Items      []int     `json:"items"`
 	Priority   int       `json:"priority"`
-	MaxWait    int       `json:"max_wait"`
+	MaxWait    float64   `json:"max_wait"`
 	PickUpTime time.Time `json:"pick_up_time"`
 }
 
@@ -43,4 +43,4 @@ var OrderMap = make(map[int]ReceivedOrd)
 var OrderMapMutex = &sync.Mutex{}
 
 // waiter's goroutine receive orders on channel
-var OrdersChannel = make(chan int, 10)
+var OrdersChannel = make(chan ReceivedOrd, 20)
