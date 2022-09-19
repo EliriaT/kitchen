@@ -1,13 +1,7 @@
 package kitchen_elem
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-	"log"
-	"net/http"
 	"sync"
-	"time"
 )
 
 type Food struct {
@@ -18,75 +12,17 @@ type Food struct {
 	CookingApparatus string `json:"cooking-apparatus"`
 }
 
-type OrderInKitchen struct {
-	Id    int
-	Foods []FoodToCook
-	Wg    *sync.WaitGroup
-}
-
-func (o *OrderInKitchen) WaitForOrder(initialOrder ReceivedOrd) {
-	cookingTime := time.Now()
-	o.Wg.Wait()
-	var cookedOrder SentOrd
-
-	//SA FAC CA SA TRANSMIT COOKID
-	var foodCookedInfo = make([]KitchenFoodInf, 0, len(initialOrder.Items))
-
-	for _, foodID := range initialOrder.Items {
-		foodCookedInfo = append(foodCookedInfo, KitchenFoodInf{
-			FoodId: foodID,
-			CookId: -1,
-		})
-	}
-
-	cookedOrder.OrderId = initialOrder.OrderId
-	cookedOrder.TableId = initialOrder.TableId
-	cookedOrder.WaiterId = initialOrder.WaiterId
-	cookedOrder.Items = initialOrder.Items
-	cookedOrder.Priority = initialOrder.Priority
-	cookedOrder.MaxWait = initialOrder.MaxWait
-	cookedOrder.PickUpTime = initialOrder.PickUpTime
-	cookedOrder.CookingTime = time.Since(cookingTime)
-	cookedOrder.CookingDetails = foodCookedInfo
-
-	o.sendOrder(cookedOrder)
-}
-
-func (o *OrderInKitchen) sendOrder(cookedOrder SentOrd) {
-	reqBody, err := json.Marshal(cookedOrder)
-	if err != nil {
-		log.Printf(err.Error())
-		return
-	}
-
-	resp, err := http.Post("http://localhost:8082/distribution", "application/json", bytes.NewBuffer(reqBody))
-
-	if err != nil {
-		log.Printf("Request Failed: %s", err.Error())
-		return
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Printf(err.Error())
-			return
-		}
-	}(resp.Body)
-	//body, err := io.ReadAll(resp.Body) // Log the request body
-	//if err != nil {
-	//	log.Printf("Can't read the response body %s", err.Error())
-	//	return
-	//}
-	//bodyString := string(body)
-	//log.Print(bodyString)
-	log.Printf("The order with id %d was sent to Dinning Hall .", cookedOrder.OrderId) // Unmarshal result
-
+// info of cooked food
+type KitchenFoodInf struct {
+	FoodId int `json:"food_id"`
+	CookId int `json:"cook_id"`
 }
 
 type FoodToCook struct {
 	OrderId int
 	//used to find the time for cooking in the foods list; rather should be named foodsMenu
 	FoodId int
+	CookId int
 	Wg     *sync.WaitGroup
 }
 

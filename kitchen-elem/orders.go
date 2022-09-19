@@ -1,6 +1,11 @@
 package kitchen_elem
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"log"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -18,12 +23,6 @@ type SentOrd struct {
 	CookingDetails []KitchenFoodInf `json:"cooking_details"`
 }
 
-// info of cooked food
-type KitchenFoodInf struct {
-	FoodId int `json:"food_id"`
-	CookId int `json:"cook_id"`
-}
-
 // the response received from dinning hall
 type ReceivedOrd struct {
 	OrderId    int       `json:"order_id"`
@@ -35,12 +34,64 @@ type ReceivedOrd struct {
 	PickUpTime time.Time `json:"pick_up_time"`
 }
 
-// a map of order ID with key, and the order as value
-var OrderMap = make(map[int]ReceivedOrd)
+type OrderInKitchen struct {
+	Id    int
+	Foods []FoodToCook
+	Wg    *sync.WaitGroup
+}
 
-// a mutex for locking reading or writing to the orderMap
-// &sync.Mutex{}
-var OrderMapMutex = &sync.Mutex{}
+func (o *OrderInKitchen) WaitForOrder(initialOrder ReceivedOrd, cookedFoods []FoodToCook) {
+	cookingTime := time.Now()
+	o.Wg.Wait()
+	var cookedOrder SentOrd
+
+	//SA FAC CA SA TRANSMIT COOKID
+	var foodCookedInfo = make([]KitchenFoodInf, 0, len(initialOrder.Items))
+
+	for _, food := range cookedFoods {
+		foodCookedInfo = append(foodCookedInfo, KitchenFoodInf{
+			FoodId: food.FoodId,
+			CookId: food.CookId,
+		})
+	}
+
+	cookedOrder.OrderId = initialOrder.OrderId
+	cookedOrder.TableId = initialOrder.TableId
+	cookedOrder.WaiterId = initialOrder.WaiterId
+	cookedOrder.Items = initialOrder.Items
+	cookedOrder.Priority = initialOrder.Priority
+	cookedOrder.MaxWait = initialOrder.MaxWait
+	cookedOrder.PickUpTime = initialOrder.PickUpTime
+	cookedOrder.CookingTime = time.Since(cookingTime)
+	cookedOrder.CookingDetails = foodCookedInfo
+
+	o.sendOrder(cookedOrder)
+}
+
+func (o *OrderInKitchen) sendOrder(cookedOrder SentOrd) {
+	reqBody, err := json.Marshal(cookedOrder)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+
+	resp, err := http.Post("http://localhost:8082/distribution", "application/json", bytes.NewBuffer(reqBody))
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err.Error())
+		return
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf(err.Error())
+			return
+		}
+	}(resp.Body)
+
+	log.Printf("The order with id %d was sent to Dinning Hall .", cookedOrder.OrderId) // Unmarshal result
+
+}
 
 // waiter's goroutine receive orders on channel
 var OrdersChannel = make(chan ReceivedOrd, 20)
