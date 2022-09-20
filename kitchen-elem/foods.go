@@ -1,6 +1,10 @@
 package kitchen_elem
 
-type food struct {
+import (
+	"sync"
+)
+
+type Food struct {
 	Id               int    `json:"id"`
 	Name             string `json:"name"`
 	PreparationTime  int    `json:"preparation-time"`
@@ -8,7 +12,20 @@ type food struct {
 	CookingApparatus string `json:"cooking-apparatus"`
 }
 
-var foods = []food{
+// info of cooked food
+type KitchenFoodInf struct {
+	FoodId int `json:"food_id"`
+	CookId int `json:"cook_id"`
+}
+
+type FoodToCook struct {
+	OrderId int
+	FoodId  int
+	CookId  int
+	Wg      *sync.WaitGroup
+}
+
+var Foods = []Food{
 	{Id: 1, Name: "pizza", PreparationTime: 20, Complexity: 2, CookingApparatus: "oven"},
 	{Id: 2, Name: "salad", PreparationTime: 10, Complexity: 1, CookingApparatus: ""},
 	{Id: 3, Name: "zeama", PreparationTime: 7, Complexity: 1, CookingApparatus: "stove"},
