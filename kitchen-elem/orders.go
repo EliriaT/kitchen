@@ -35,13 +35,17 @@ type ReceivedOrd struct {
 }
 
 type OrderInKitchen struct {
-	Id    int
-	Foods []FoodToCook
-	Wg    *sync.WaitGroup
+	Id            int
+	Foods         []FoodToCook
+	ReceivedOrder ReceivedOrd
+	Wg            *sync.WaitGroup
+	Priority      int
+	Index         int
 }
 
-func (o *OrderInKitchen) WaitForOrder(initialOrder ReceivedOrd, cookedFoods []FoodToCook) {
+func (o *OrderInKitchen) WaitForOrder(cookedFoods []FoodToCook) {
 	cookingTime := time.Now()
+	initialOrder := o.ReceivedOrder
 	o.Wg.Wait()
 	var cookedOrder SentOrd
 
@@ -75,7 +79,7 @@ func (o *OrderInKitchen) sendOrder(cookedOrder SentOrd) {
 		return
 	}
 
-	resp, err := http.Post("http://localhost:8082/distribution", "application/json", bytes.NewBuffer(reqBody))
+	resp, err := http.Post(URL, "application/json", bytes.NewBuffer(reqBody))
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err.Error())

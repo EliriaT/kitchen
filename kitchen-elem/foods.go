@@ -20,10 +20,9 @@ type KitchenFoodInf struct {
 
 type FoodToCook struct {
 	OrderId int
-	//used to find the time for cooking in the foods list; rather should be named foodsMenu
-	FoodId int
-	CookId int
-	Wg     *sync.WaitGroup
+	FoodId  int
+	CookId  int
+	Wg      *sync.WaitGroup
 }
 
 var Foods = []Food{
