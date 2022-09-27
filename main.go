@@ -78,19 +78,19 @@ func listenForOrders() {
 		}
 		//log.Println(kitchenOrder)
 		//push to the priority queue
+
 		queue.Insert(kitchenOrder, float64(kitchenOrder.Priority))
-		//heap.Push(&pq, kitchenOrder)
-		//pq.Update(kitchenOrder)
 
 		//If no cook is free, then take another order
 		if len(kitchen_elem.CookFree) == 11 {
 			continue
 		}
+
 		//take the order with best priority (1 the best))  [IT SHOULD ALSO BE SORTED BY TIME?]
 		//Further we should work ONLY with order !
 		order := queue.PopLowest().(kitchen_elem.OrderInKitchen)
 		//log.Println(order)
-
+		//order := kitchenOrder
 		for _, foodToCook := range order.Foods {
 
 			foodID := foodToCook.FoodId

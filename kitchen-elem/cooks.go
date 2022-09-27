@@ -35,6 +35,8 @@ func (c *cook) cookFood(food FoodToCook) {
 }
 
 var CookFree = make(chan int, 11)
+
+// to make a json
 var Cooks = []cook{
 	{Id: 1, Rank: 3, Proficiency: 4, Name: "Mike", CatchPhrase: "I like ice-creams!", FoodChan: make(chan FoodToCook, 100), ProfficiencyChan: make(chan int, 4)},
 	{Id: 2, Rank: 2, Proficiency: 3, Name: "William", CatchPhrase: "So many customers these days..", FoodChan: make(chan FoodToCook, 100), ProfficiencyChan: make(chan int, 3)},
