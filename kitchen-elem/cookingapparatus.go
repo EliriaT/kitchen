@@ -28,7 +28,7 @@ type apparatuses struct {
 
 func InitiateApparatus() {
 
-	file, err := os.Open("kitchen-elem/jsonConfig/apparatus.json")
+	file, err := os.Open("./jsonConfig/apparatus.json")
 	if err != nil {
 		log.Fatal("Error opening apparatus.json", err)
 	}

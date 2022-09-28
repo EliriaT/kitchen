@@ -188,7 +188,7 @@ func listenForOrders() {
 
 func main() {
 	//fmt.Println(runtime.NumCPU())
-	runtime.GOMAXPROCS(2)
+	runtime.GOMAXPROCS(8)
 	rand.Seed(time.Now().UnixNano())
 	kitchen_elem.InitiateApparatus()
 
