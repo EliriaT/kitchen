@@ -5,11 +5,11 @@ import (
 )
 
 type Food struct {
-	Id               int    `json:"id"`
-	Name             string `json:"name"`
-	PreparationTime  int    `json:"preparation-time"`
-	Complexity       int    `json:"complexity"`
-	CookingApparatus string `json:"cooking-apparatus"`
+	Id               int           `json:"id"`
+	Name             string        `json:"name"`
+	PreparationTime  int           `json:"preparation-time"`
+	Complexity       int           `json:"complexity"`
+	CookingApparatus apparatusType `json:"cooking-apparatus"`
 }
 
 // info of cooked food
@@ -19,10 +19,11 @@ type KitchenFoodInf struct {
 }
 
 type FoodToCook struct {
-	OrderId int
-	FoodId  int
-	CookId  int
-	Wg      *sync.WaitGroup
+	OrderId          int
+	FoodId           int
+	CookId           int
+	CookingApparatus apparatusType
+	Wg               *sync.WaitGroup
 }
 
 var Foods = []Food{

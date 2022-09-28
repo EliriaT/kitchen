@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"github.com/EliriaT/kitchen/kitchen-elem"
 	"github.com/gorilla/mux"
-	pq "github.com/kyroy/priority-queue"
+	"runtime"
+
+	//pq "github.com/kyroy/priority-queue"
+	//_ "go.uber.org/automaxprocs"
 	"log"
 	"math/rand"
 	"net/http"
@@ -48,7 +51,7 @@ func receiveOrder(w http.ResponseWriter, r *http.Request) {
 
 func listenForOrders() {
 
-	queue := pq.NewPriorityQueue()
+	//queue := pq.NewPriorityQueue()
 
 	//here to use smth like a signal to notify when a cook is free. As long as a cook is free we can distribute the order with the most priority
 	for order := range kitchen_elem.OrdersChannel {
@@ -68,9 +71,9 @@ func listenForOrders() {
 		//generating the food to cook
 		for _, foodId := range order.Items {
 			newFood := kitchen_elem.FoodToCook{
-				OrderId: order.OrderId,
-				FoodId:  foodId,
-
+				OrderId:          order.OrderId,
+				FoodId:           foodId,
+				CookingApparatus: kitchen_elem.Foods[foodId-1].CookingApparatus,
 				//kitchenOrder.Wg is already a pointer
 				Wg: kitchenOrder.Wg,
 			}
@@ -79,18 +82,25 @@ func listenForOrders() {
 		//log.Println(kitchenOrder)
 		//push to the priority queue
 
-		queue.Insert(kitchenOrder, float64(kitchenOrder.Priority))
+		//queue.Insert(kitchenOrder, float64(kitchenOrder.Priority))
 
 		//If no cook is free, then take another order
-		if len(kitchen_elem.CookFree) == 11 {
-			continue
-		}
+		//select {
+		//case kitchen_elem.CookFree <- 1:
+		//	<-kitchen_elem.CookFree
+		//default:
+		//	continue
+		//}
+
+		//if len(kitchen_elem.CookFree) == 11 {
+		//	continue
+		////}
 
 		//take the order with best priority (1 the best))  [IT SHOULD ALSO BE SORTED BY TIME?]
 		//Further we should work ONLY with order !
-		order := queue.PopLowest().(kitchen_elem.OrderInKitchen)
+		//order := queue.PopLowest().(kitchen_elem.OrderInKitchen)
 		//log.Println(order)
-		//order := kitchenOrder
+		order := kitchenOrder
 		for _, foodToCook := range order.Foods {
 
 			foodID := foodToCook.FoodId
@@ -98,21 +108,75 @@ func listenForOrders() {
 			switch complexity := kitchen_elem.Foods[foodID-1].Complexity; complexity {
 			//i can use here another factor; cooks's freeness , depending on a channel if he is free(the profficiency channel) or not; but for this i should sort by complexity descending
 			case 3:
-				kitchen_elem.Cooks[0].FoodChan <- foodToCook
-				foodToCook.CookId = 1
+				select {
+				case kitchen_elem.Cooks[0].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[0].ProfficiencyChan
+					foodToCook.CookId = 1
+					kitchen_elem.Cooks[0].FoodChan <- foodToCook
 
-			case 2:
-				if rand.Intn(2) == 0 {
-					kitchen_elem.Cooks[1].FoodChan <- foodToCook
-					foodToCook.CookId = 2
-				} else {
-					kitchen_elem.Cooks[2].FoodChan <- foodToCook
-					foodToCook.CookId = 3
+				default:
+					foodToCook.CookId = 1
+					kitchen_elem.Cooks[0].FoodChan <- foodToCook
 				}
 
+			case 2:
+				select {
+				case kitchen_elem.Cooks[1].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[1].ProfficiencyChan
+					foodToCook.CookId = 2
+					kitchen_elem.Cooks[1].FoodChan <- foodToCook
+
+				case kitchen_elem.Cooks[2].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[2].ProfficiencyChan
+					foodToCook.CookId = 3
+					kitchen_elem.Cooks[2].FoodChan <- foodToCook
+
+				case kitchen_elem.Cooks[0].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[0].ProfficiencyChan
+					foodToCook.CookId = 1
+					kitchen_elem.Cooks[0].FoodChan <- foodToCook
+
+				default:
+					foodToCook.CookId = 2
+					kitchen_elem.Cooks[1].FoodChan <- foodToCook
+				}
+				//if rand.Intn(2) == 0 {
+				//	foodToCook.CookId = 2
+				//	kitchen_elem.Cooks[1].FoodChan <- foodToCook
+				//
+				//} else {
+				//	foodToCook.CookId = 3
+				//	kitchen_elem.Cooks[2].FoodChan <- foodToCook
+				//
+				//}
+
 			case 1:
-				kitchen_elem.Cooks[3].FoodChan <- foodToCook
-				foodToCook.CookId = 4
+				select {
+				case kitchen_elem.Cooks[1].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[1].ProfficiencyChan
+					foodToCook.CookId = 2
+					kitchen_elem.Cooks[1].FoodChan <- foodToCook
+
+				case kitchen_elem.Cooks[2].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[2].ProfficiencyChan
+					foodToCook.CookId = 3
+					kitchen_elem.Cooks[2].FoodChan <- foodToCook
+
+				case kitchen_elem.Cooks[0].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[0].ProfficiencyChan
+					foodToCook.CookId = 1
+					kitchen_elem.Cooks[0].FoodChan <- foodToCook
+
+				case kitchen_elem.Cooks[3].ProfficiencyChan <- 1:
+					<-kitchen_elem.Cooks[3].ProfficiencyChan
+					foodToCook.CookId = 4
+					kitchen_elem.Cooks[3].FoodChan <- foodToCook
+				default:
+					//foodToCook.CookId = 1
+					//kitchen_elem.Cooks[0].FoodChan <- foodToCook
+					foodToCook.CookId = 4
+					kitchen_elem.Cooks[3].FoodChan <- foodToCook
+				}
 
 			}
 
@@ -123,8 +187,10 @@ func listenForOrders() {
 }
 
 func main() {
-
+	//fmt.Println(runtime.NumCPU())
+	runtime.GOMAXPROCS(2)
 	rand.Seed(time.Now().UnixNano())
+	kitchen_elem.InitiateApparatus()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", getCooks).Methods("GET")

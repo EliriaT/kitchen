@@ -21,8 +21,27 @@ func (c *cook) ListenForFood() {
 		c.ProfficiencyChan <- food.FoodId
 		//it is sent by value
 		//log.Printf("Cook %d cooks food %d", c.Id, food.FoodId)
-		go c.cookFood(food)
-		<-CookFree
+
+		if food.CookingApparatus == ovenLit {
+
+			<-c.ProfficiencyChan
+			<-CookFree
+			//the cooks sends food to apparatus and the proceeds
+			go Ovens.cookFood(food)
+
+		} else if food.CookingApparatus == stoveLit {
+
+			<-c.ProfficiencyChan
+			<-CookFree
+			//the cooks sends food to apparatus and the proceeds
+			go Stoves.cookFood(food)
+
+		} else {
+			go c.cookFood(food)
+		}
+
+		//here is cheating?
+		//<-CookFree
 	}
 }
 
@@ -31,10 +50,9 @@ func (c *cook) cookFood(food FoodToCook) {
 	time.Sleep(TimeUnit * time.Duration(Foods[food.FoodId-1].PreparationTime))
 	food.Wg.Done()
 	<-c.ProfficiencyChan
+	<-CookFree
 
 }
-
-var CookFree = make(chan int, 11)
 
 // to make a json
 var Cooks = []cook{
