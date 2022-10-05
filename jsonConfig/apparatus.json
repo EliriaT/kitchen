@@ -2,11 +2,11 @@
 	"apparatuses": [
 		{
 		"name": "oven",
-		"quantity": 2
+		"quantity":2
 		},
 		{
 		"name": "stove",
-		"quantity": 1
+		"quantity":1
 		}
 	]
 }

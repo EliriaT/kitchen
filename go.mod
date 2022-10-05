@@ -12,6 +12,7 @@ require (
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/karalabe/cookiejar v0.0.0-20150724131613-8dcd6a7f4951 // indirect
 	github.com/kyroy/priority-queue v0.0.0-20180327160706-6e21825e7e0c // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
