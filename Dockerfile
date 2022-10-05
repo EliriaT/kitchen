@@ -2,7 +2,7 @@
 FROM golang:alpine as build
 
 # using build as current directory
-WORKDIR /build
+WORKDIR /app
 
 # adding the source code to current dir:
 COPY . .
@@ -21,7 +21,8 @@ FROM alpine:latest
 WORKDIR /app
 
 # copy server binary from `build` layer
-COPY --from=build /build/kitchen .
+COPY --from=build /app/kitchen .
+COPY --from=build /app/jsonConfig ./jsonConfig
 
 # binary to run
 CMD "/app/kitchen"

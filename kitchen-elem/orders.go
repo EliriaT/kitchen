@@ -39,17 +39,18 @@ type OrderInKitchen struct {
 	Foods         []FoodToCook
 	ReceivedOrder ReceivedOrd
 	Wg            *sync.WaitGroup
-	Priority      int
+	Priority      uint8
 	Index         int
 }
 
 func (o *OrderInKitchen) WaitForOrder(cookedFoods []FoodToCook) {
 	cookingTime := time.Now()
 	initialOrder := o.ReceivedOrder
+	//wait for the foods to be prepared
 	o.Wg.Wait()
+
 	var cookedOrder SentOrd
 
-	//SA FAC CA SA TRANSMIT COOKID
 	var foodCookedInfo = make([]KitchenFoodInf, 0, len(initialOrder.Items))
 
 	for _, food := range cookedFoods {
@@ -93,9 +94,6 @@ func (o *OrderInKitchen) sendOrder(cookedOrder SentOrd) {
 		}
 	}(resp.Body)
 
-	log.Printf("The order with id %d was sent to Dinning Hall .", cookedOrder.OrderId) // Unmarshal result
+	log.Printf("The order with id %d was sent to Dinning Hall .", cookedOrder.OrderId)
 
 }
-
-// waiter's goroutine receive orders on channel
-var OrdersChannel = make(chan ReceivedOrd, 20)

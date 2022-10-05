@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	TimeUnit = time.Duration(float64(time.Millisecond) * 10)
+	TimeUnit         = time.Duration(float64(time.Millisecond) * 10)
+	ApparatusQuantum = 10
 	//URL      = "http://dinning-hall:8082/distribution"
 	URL = "http://localhost:8082/distribution"
 )
@@ -20,6 +21,9 @@ const (
 var (
 	Ovens  Apparatus
 	Stoves Apparatus
-	//used for priority
-	CookFree = make(chan int, 11)
+
+	OrdersChannel = make(chan ReceivedOrd, 20)
+	CookFree      = make(chan int, 11)
+	Cooks         []cook
+	Foods         []Food
 )
