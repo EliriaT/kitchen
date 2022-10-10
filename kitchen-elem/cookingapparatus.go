@@ -22,7 +22,7 @@ func (a Apparatus) CookFood() {
 func (a Apparatus) cookQuantumTime(food FoodToCook) {
 	if food.PrepTime <= ApparatusQuantum {
 		time.Sleep(TimeUnit * time.Duration(food.PrepTime))
-
+		NrFoodsQueue--
 		food.Wg.Done()
 
 	} else {

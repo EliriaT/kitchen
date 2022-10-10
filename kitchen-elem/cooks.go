@@ -15,10 +15,6 @@ type cook struct {
 	ProfficiencyChan chan int
 }
 
-type cooks struct {
-	cooksList []cook `json:"cooks"`
-}
-
 func (c *cook) ListenForFood() {
 	for food := range c.FoodChan {
 		CookFree <- 1
@@ -51,6 +47,7 @@ func (c *cook) ListenForFood() {
 func (c *cook) cookFood(food FoodToCook) {
 	time.Sleep(TimeUnit * time.Duration(Foods[food.FoodId-1].PreparationTime))
 	food.Wg.Done()
+	NrFoodsQueue--
 	<-c.ProfficiencyChan
 	<-CookFree
 }
