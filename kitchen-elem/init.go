@@ -28,7 +28,6 @@ func initiate_Cooks() {
 		Cooks[i].ProfficiencyChan = make(chan int, Cooks[i].Proficiency)
 		Cooks[i].FoodChan = make(chan FoodToCook, 100)
 	}
-	log.Println(Cooks)
 
 }
 
@@ -41,8 +40,6 @@ func initiate_Foods() {
 
 	byteValue, _ := io.ReadAll(file)
 	_ = json.Unmarshal(byteValue, &Foods)
-
-	log.Println(Foods)
 
 }
 
@@ -68,14 +65,14 @@ func initiateApparatus() {
 
 			stove = apparList.ApparatusList[i]
 			stove.Accepted = make(chan FoodToCook, 100)
-			log.Println(stove)
+
 			Stoves = stove
 
 		} else if apparList.ApparatusList[i].Name == ovenLit {
 
 			oven = apparList.ApparatusList[i]
 			oven.Accepted = make(chan FoodToCook, 100)
-			log.Println(oven)
+
 			Ovens = oven
 
 		}

@@ -3,6 +3,7 @@ package kitchen_elem
 func SendFoodsToCooks(kitchenOrder OrderInKitchen) {
 	for i, foodToCook := range kitchenOrder.Foods {
 
+		NrFoodsQueue++
 		foodID := foodToCook.FoodId
 
 		switch complexity := Foods[foodID-1].Complexity; complexity {
