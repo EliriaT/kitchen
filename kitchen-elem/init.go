@@ -8,9 +8,27 @@ import (
 )
 
 func StartWorkDay() {
+	initiate_Congif()
 	initiate_Cooks()
 	initiateApparatus()
 	initiate_Foods()
+
+}
+
+func initiate_Congif() {
+	var config map[string]string
+
+	file, err := os.Open("./jsonConfig/config.json")
+	if err != nil {
+		log.Fatal("Error opening config.json ", err)
+	}
+	defer file.Close()
+
+	byteValue, _ := io.ReadAll(file)
+
+	_ = json.Unmarshal(byteValue, &config)
+	URL = config["address"]
+	Port = config["listenning_port"]
 
 }
 
