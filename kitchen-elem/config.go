@@ -5,10 +5,9 @@ import (
 )
 
 const (
-	TimeUnit         = time.Duration(float64(time.Millisecond) * 10)
+	TimeUnit         = time.Duration(float64(time.Millisecond) * 25)
 	ApparatusQuantum = 10
-	//URL              = "http://dinning-hall:8082/distribution"
-	URL                = "http://localhost:8082/distribution"
+
 	CookingApparatus   = 3
 	CooksProffieciency = 11
 )
@@ -21,6 +20,10 @@ const (
 )
 
 var (
+	//URL              = "http://dinning-hall:8082/distribution"
+	URL  = "http://localhost:8082/distribution"
+	Port string
+
 	Ovens        Apparatus
 	Stoves       Apparatus
 	NrFoodsQueue = 0

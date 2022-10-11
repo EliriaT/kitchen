@@ -1,0 +1,4 @@
+{
+  "address":"http://dinning-hall1:8082/distribution",
+  "listenning_port": ":8080"
+}

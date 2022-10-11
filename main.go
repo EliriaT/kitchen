@@ -43,6 +43,6 @@ func main() {
 
 	log.Println("Kitchen server started..")
 	log.Println("Quantum Apparatus: ", kitchen_elem.ApparatusQuantum)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(kitchen_elem.Port, r))
 
 }

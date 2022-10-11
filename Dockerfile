@@ -22,9 +22,8 @@ WORKDIR /app
 
 # copy server binary from `build` layer
 COPY --from=build /app/kitchen .
-COPY --from=build /app/jsonConfig ./jsonConfig
+#COPY --from=build /app/jsonConfig ./jsonConfig
 
 # binary to run
 CMD "/app/kitchen"
 
-EXPOSE 8080
