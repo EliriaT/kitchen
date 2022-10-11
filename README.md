@@ -45,8 +45,14 @@ To run the App, run in terminal the following command:<br />
 2. Then run the container using the created image:<br />
 
 `docker run --name kitchen --network restaurant -it --rm  -p 8080:8080 kitchen-go-server`
+
+
 To run different kitchens with different configurations, use volume bind. Example:
+
+
 `docker run --name kitchen1 -v /home/irina/UTM/SEM5/PR/LAB2/First_Checkpoint/kitchen/jsonConfig:/app/jsonConfig --network restaurant -it --rm  -p 8080:8080 kitchen-go-server`
+
+
 `docker run --name kitchen2 -v /home/irina/UTM/SEM5/PR/LAB2/First_Checkpoint/kitchen/jsonConfig2:/app/jsonConfig --network restaurant -it --rm  -p 8086:8086 kitchen-go-server`
 
 For this you firstly need a created docker network. To create a docker network run:
