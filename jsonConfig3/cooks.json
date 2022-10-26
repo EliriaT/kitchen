@@ -1,0 +1,31 @@
+[
+    {
+        "id": 1,
+    "rank": 3,
+    "proficiency": 4,
+    "name": "Gordon Ramsay",
+    "catch-phrase": "Hey, panini head, are you listening to me?"
+    },
+    {
+        "id": 2,
+    "rank": 2,
+    "proficiency": 3,
+    "name": "Mike",
+    "catch-phrase": "If you'll reach it."
+    },
+    {
+        "id": 3,
+    "rank": 2,
+    "proficiency": 3,
+    "name": "William",
+    "catch-phrase": "When in doubt, use brute force."
+    },
+    {
+        "id": 4,
+    "rank": 1,
+    "proficiency": 2,
+    "name": "Elizabeth",
+    "catch-phrase": "Share memory by communicating."
+    }
+]
+

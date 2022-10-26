@@ -1,7 +1,6 @@
 package kitchen_elem
 
 import (
-	"log"
 	"time"
 )
 
@@ -38,7 +37,7 @@ func (c *cook) ListenForFood() {
 			go c.cookFood(food)
 		}
 
-		log.Printf("Cook %d cooks food %d", c.Id, food.FoodId)
+		//log.Printf("Cook %d cooks food %d", c.Id, food.FoodId)
 
 	}
 }

@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+	//log.SetOutput(io.Discard)
 	//fmt.Println(runtime.NumCPU())
 	runtime.GOMAXPROCS(6)
 

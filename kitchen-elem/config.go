@@ -24,8 +24,9 @@ var (
 	URL  = "http://localhost:8082/distribution"
 	Port string
 
-	Ovens        Apparatus
-	Stoves       Apparatus
+	Ovens  Apparatus
+	Stoves Apparatus
+	//TODO it should be atomic
 	NrFoodsQueue = 0
 
 	OrdersChannel = make(chan ReceivedOrd, 20)
